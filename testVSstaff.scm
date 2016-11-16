@@ -125,19 +125,17 @@
 	    "##  5   /   2 - 4 + 3 *  -7/16  * 9 * 154  "
 ))
 
-;(runAllTests
-  ;(list
-    (runTests "Boolean" booleanTests)
-    (runTests "Number" numberTests)
-    (runTests "Char" charTests)
-    (runTests "String" stringTests)
-    (runTests "Symbol" symbolTests)
-    (runTests "Vector" vectorTests)
-    (runTests "Quasiquoted" quasiquotedTests)
-    (runTests "Quoted" quotedTests)
-    (runTests "UnquoteAndSpliced" unquoteAndSplicedTests)
-    (runTests "Unquoted" unquotedTests)
-    (runTests "Proper List" properListTests)
-    (runTests "Improper List" improperListTests)
-    (runTests "Infix Exp" infixExpTests)
-    ;))
+
+(runTests "Boolean" booleanTests)
+(runTests "Number" numberTests)
+(runTests "Char" charTests)
+(runTests "String" stringTests)
+(runTests "Symbol" symbolTests)
+(runTests "Vector" vectorTests)
+(runTests "Quasiquoted" quasiquotedTests)
+(runTests "Quoted" quotedTests)
+(runTests "UnquoteAndSpliced" unquoteAndSplicedTests)
+(runTests "Unquoted" unquotedTests)
+(runTests "Proper List" properListTests)
+(runTests "Improper List" improperListTests)
+(runTests "Infix Exp" infixExpTests)
