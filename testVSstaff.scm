@@ -1,87 +1,143 @@
-(load "parser.so")
-(load "compiler.scm")
+(load "~/compilation/parser.so")
+(load "~/compilation/compiler.scm")
 
 (define <my-sexpr> <sexpr-2>)
 (define <staff-sexpr> <sexpr>)
 
 (define testVSstaff
-	(lambda (input test-name)
+	(lambda (input)
 		(let ((my-res (test-string <my-sexpr> input))
 		      (staff-res (test-string <staff-sexpr> input)))
-			(display test-name)
-			(display ": ")
-			(display staff-res)
+			(display input)
+			(display ": ")			
 			(cond ((equal? my-res staff-res)
-				(newline) #t)
-				(else (display ": Failed with input string: ") 
-				      (display input)
+				(display "\033[1;32mSuccess!\033[0m") (newline) #t)
+				(else (display ": \033[1;31mFailed!\033[0m ") 
 					(display ", expected: ")					
 					(display staff-res)
 					(display ", actual:")
 					(display my-res)
-					(newline)))
+					(newline)
+					#f))
 			)))
-
-
-(define test-fail
-	(lambda (parser input test-name)
-		(display test-name)
-		(let ((res (test-string parser input)))
-			(cond ((equal? '(failed with report:) res) (newline) #t)
-				(else (display "Failed with input string: ") (display input) (newline))
-			)
-			)))				
-
-(define testsResults
-	(lambda (tests)
-		(if (andmap (lambda (exp) (equal? exp #t)) tests)
-			(display "SUCCESS!")
-			(display "FAILED!"))
-			(newline)
+			
+(define runTests
+  (lambda (tests-name lst)
+	(newline)
+	(display tests-name)
+	(display ":")
+	(newline)
+	(display "=============")
+	(newline)
+	(cond ((andmap (lambda (exp) (equal? (testVSstaff exp) #t)) lst)		
+		(display "\033[1;32mSUCCESS!\033[0m\n") #t)
+		(else (display "\033[1;31mFAILED!\033[0m\n") #f))
+		(newline)
 ))
 
-(define tests
+(define runAllTests
+  (lambda (lst)
+    (cond ((andmap (lambda (test) (display (car test)) (equal? (runTests (car test) (cadr test)) #t)) lst)
+      (display "\033[1;32m !!!!!! ALL TESTS SUCCEED !!!!! \033[0m\n") #t)
+      (else (display "\033[1;31m ****** SOME TESTS FAILED ***** \033[0m\n") #f))
+))
+
+(define booleanTests (list "#t" "#f"))
+	 
+(define numberTests
+	(list "0" "9" "123" "0987" "-5" "+8" "   -456   "
+	      "657" "0/4" "8/28" "-2/4" "+2/4" "-2 / 4"
+	 ))
+	  
+(define charTests
+	(list	"#\\a" "#\\9" "#\\space" "#\\lambda"
+		"#\\newline" "#\\nul" "#\\page"
+		"#\\return" "#\\tab" "#\\x41" "#\\x23" "#\\x20"
+	  ))
+	  
+(define stringTests
 	(list
-	  (begin
-	  ; Boolean
-	  (testVSstaff "#t" "Boolean True value")
-	  (testVSstaff "#f" "Boolean False value")	  
-	  
-	  ;<Number>	
-	  (testVSstaff "0" "<Number> Test1")
-	  (testVSstaff "9" "<Number> Test2")
-	  (testVSstaff "123" "<Number> Test3")
-	  (testVSstaff "0987" "<Number> Test4")
-	  (testVSstaff "-5" "<Number> Test5")
-	  (testVSstaff "+8" "<Number> Test6")
-	  (testVSstaff "   -456   " "<Number> Test7")
-	  (testVSstaff "657" "<Number> Test8")
-	  (testVSstaff "0/4" "<Number> Test1")
-	  (testVSstaff "8/28" "<Number> Test2")
-	  (testVSstaff "-2/4" "<Number> Test3")
-	  (testVSstaff "+2/4" "<Number> Test4")
-	  (testVSstaff "-2 / 4" "<Number> Test5")
-	  
-	  ;<Char>	
-	  (testVSstaff "#\\a" "<Char> Test1")
-	  (testVSstaff "#\\9" "<Char> Test2")
-	  (testVSstaff "#\\space" "<Char> Test3")
-	  (testVSstaff "#\\lambda" "<Char> Test4")
-	  (testVSstaff "#\\newline" "<Char> Test5")	  
-	  (testVSstaff "#\\nul" "<Char> Test6")
-	  (testVSstaff "#\\page" "<Char> Test7")	  
-	  (testVSstaff "#\\return" "<Char> Test8")	  
-	  (testVSstaff "#\\tab" "<Char> Test9")	  
-	  (testVSstaff "#\\x41" "<Char> Test10")
-	  (testVSstaff "#\\x23" "<Char> Test11")	  
-	  (testVSstaff "#\\x20" "<Char> Test12")
-	  
-	  (testVSstaff "(a b      #t c . (d e #f \"str1\"   )    )" "Improper List1")
-	  (testVSstaff "(#t abc . a)" "Improper List2")											
-	  (testVSstaff "(abc#t . a)" "Improper List3")		
-	  (testVSstaff "(#t #f #\\a abc . (a b c)  )" "Improper List4")	  
-	  
-)))
+	  "\"\\\\\"" "\"\\t\"" "\"\\\"\"" "\"\\f\""	  	  
+	  "\"\\n\"" "\"\\r\"" "\"\\x09af;\"" "\"\\x41;\""
+	  "\" 4 1;\"" "\"Akuna Matata\""
+	  ))
 
-(testsResults tests)
+(define symbolTests
+	(list 
+	"0123456789" "abcdeABCDE" "!$^*-_=+<>?/" 
+	"0123456789abcdeABCDE!$^*-_=+<>?/" 
+	"Hellomynameisasaf"
+	  ))
+	  
+	  
+(define properListTests
+	(list
+	  "(a)" "(\"abc\")" "(a #t #f -2/4 -14 0 \"\\t\" #\\lambda \"\\x41;\")"
+	  "(#\\return)" "( (a b c) #t #f)" "(#\\a (a b .c ) -54/32)" "((a b.c))"
+	  ))	  
+	  
+(define improperListTests
+	(list
+	    "(a b      #t c . (d e #f \"str1\"   )    )"
+	    "(#t abc . a)"							
+	    "(abc#t . a)"
+	    "(#t #f #\\a abc . (a b c)  )"
+	    "(#\\a #\\b (\"a1234\" . 123) . #t)"
+	  ))
+	  
+(define vectorTests
+  (list 
+    "#()" "#(#\\lambda \"abc\" -56/38)" 
+  ))
+  
+(define quotedTests
+  (list 
+    "'123" "'#t" "'#\\lambda" "'\"123a\"" "'a123" 
+  ))
+  
+(define quasiquotedTests
+  (list 
+    "`123" "`#t" "`#\\lambda" "`\"123a\"" "`a123" 
+  ))
+  
+(define unquotedTests
+  (list 
+    ",123" ",#t" ",#\\lambda" ",\"123a\"" ",a123" 
+  ))
+  
+(define unquoteAndSplicedTests
+  (list 
+    ",@123" ",@#t" ",@#\\lambda" ",@\"123a\"" ",@a123" 
+  ))
+	  
+(define infixExpTests
+	(list	  
+	    "##1   +    2"
+	    "##-123+45"
+	    "##1+2+3"
+	    "##1+2+30+40"
+	    "#%1+2-50+60-70"
+	    "##1+2"
+	    "##1+2+3+4+150"
+	    "##1+2   *    5+4"
+	    "##1*5*4*6"  
+	    "##5*4+3*7*9*154"
+	    "##  5   /   2 - 4 + 3 *  -7/16  * 9 * 154  "
+))
 
+;(runAllTests
+  ;(list
+    (runTests "Boolean" booleanTests)
+    (runTests "Number" numberTests)
+    (runTests "Char" charTests)
+    (runTests "String" stringTests)
+    (runTests "Symbol" symbolTests)
+    (runTests "Vector" vectorTests)
+    (runTests "Quasiquoted" quasiquotedTests)
+    (runTests "Quoted" quotedTests)
+    (runTests "UnquoteAndSpliced" unquoteAndSplicedTests)
+    (runTests "Unquoted" unquotedTests)
+    (runTests "Proper List" properListTests)
+    (runTests "Improper List" improperListTests)
+    (runTests "Infix Exp" infixExpTests)
+    ;))
