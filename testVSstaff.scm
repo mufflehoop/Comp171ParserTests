@@ -35,13 +35,6 @@
 		(newline)
 ))
 
-(define runAllTests
-  (lambda (lst)
-    (cond ((andmap (lambda (test) (display (car test)) (equal? (runTests (car test) (cadr test)) #t)) lst)
-      (display "\033[1;32m !!!!!! ALL TESTS SUCCEED !!!!! \033[0m\n") #t)
-      (else (display "\033[1;31m ****** SOME TESTS FAILED ***** \033[0m\n") #f))
-))
-
 (define booleanTests (list "#t" "#f"))
 	 
 (define numberTests
