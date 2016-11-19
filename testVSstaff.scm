@@ -55,6 +55,7 @@
 	(list	"#\\a" "#\\9" "#\\space" "#\\lambda"
 		"#\\newline" "#\\nul" "#\\page"
 		"#\\return" "#\\tab" "#\\x41" "#\\x23" "#\\x20" "  #\\xab   "
+		"#\\x0" "#\\x110000"
 	  ))
 	  
 (define stringTests
@@ -62,6 +63,8 @@
 	  "\"\\\\\"" "\"\\t\"" "\"\\\"\"" "\"\\f\""	  	  
 	  "\"\\n\"" "\"\\r\"" "\"\\x09af;\"" "\"\\x41;\""
 	  "\" 4 1;\"" "    \"  Akuna Matata  \"    "
+	  "\"\\x0;\""
+	  "\"\\x110000;\""
 	  ))
 
 (define symbolTests
@@ -115,20 +118,38 @@
 (define infixArrayGetTests
 	(list	  
 	    "##1[2]"
+	    "#% 1+2[3]"
+	    "##b[i][j][i+j]"
 	    "##-123[+45/54]"
-	    "##1+[2+3]"
-	    "##1+2[+30+40]"
+	    "##1[2+3]"
+	    "##(1+2)[+30+40]"
 	    "#%1+2[-50+60-70]"
 	    "##1+2 [3+4+150]"
-	    "##1+2   [*    5+4]"
-	    "##1*5*[4*6]"  
+	    "##1+2   [   5+4]"
+	    "##1*5[4*6]"  
 	    "##5*4[+3*7*9*154]"
-	    "  #%  5   /   2 [- 4 + a *  -7/16  * 9 * 154 ] "
+	    "  #%  5   /   2 [-4 + a *  -7/16  * 9 * 154 ] "
 	    " ## 123a[ + bc321 ** 3  /  6]" 
+	    "## a[0] + a[a[a[a[a[0]]]]]"
 ))  
+
+(define infixFuncallTests
+	(list	  
+	    "##f( )"
+	    "##func(a,b,c,d,e,fgh)"
+	    "## FunctionCall123 ( arg1  , arg2  , arg3 , arg5)"
+	    "## func ( 1+2, 3*4)"
+)) 
 	  
 (define infixExpTests
-	(list	  
+	(list	
+	    "#% -b"
+	    "## - abc"
+	    "## 5^-32/(28*12)"
+	    "#% 5^4"
+	    "## a ^ b ^ c"
+	    "##5-4-3"
+	    "#% i+j"
 	    "##(1-2)"
 	    "#% (1+2)*3 "
 	    "##1   +    2"
@@ -143,17 +164,71 @@
 	    "##1*5*4*6"  
 	    "##((5*4)+(3*7)*9*154)"
 	    " #% (1+2)*3 "
-	    "  #%  5   /   (2 - 4) + a *  -7/16  * 9 * 154  "
+	    "  #%  5   /   (2 -4) + a *  -7/16  * 9 * 154  "
 	    " ## 123a + bc321 ** 3  /  6" 
 	    "##(b ^ 2 - 4 * a * c)"
+	    "##(-b + d) / (2 * a)"
+	    "## a ^ b ^ c ^ 3 ^ d + -50/45 ^ abc"
+	    "## 8 ^ (7+8)[5][6]"
 ))
+
+(define infixSexprEscapeTests 
+  (list
+    "## ## #t"
+    "## #% \"abc\""
+))
+
+(define commentsTests
+  (list
+  
+    "## 2 + #; 3 - 4 + 5 * 6 ^ 7 8 #; 1+2^3"
+    
+    ; Line Comments
+    " 2^5 ; ## 3+4+5"
+    
+    ; sexpr comment
+    "## 2 #; \"abc\""
+    "## #; 2+5 6+7"
+    "## #; 2+5 -b+7"
+    "## #; 2+5 abc+7"
+    "#; #\\lambda \"Timon And Pumba\" #; (1 .2)"
+    "## ( #; 1+2 1+3)"
+    "( 1 . #; #\\a 2)"
+    "( #\\r #; #\\a 2)"
+    "`(#\\a #\\b) #; #\\c"
+    "## #; 1+2 a-b[#;5+3 4+5 #; 1+5^7] #; #\\a"
+    "#; \"345\" ## 2+ #; 3- 5*6 8 #; \"abc\""
+    " \" Akuna Matata \" ; ABCE1234"
+    "#; #\\lambda ## #; 5^64*-12/45 1+2+FUNC(a#;1+2+3,b,1+5) #; \"abcde\""
+   ))
 
 (define MayerTests
   (list
   "(let* ((d ##sqrt(b ^ 2 - 4 * a * c))
-(x1 ##((-b + d) / (2 * a)))
-(x2 ##((-b - d) / (2 * a))))
-`((x1 ,x1) (x2 ,x2)))"
+  (x1 ##((-b + d) / (2 * a)))
+  (x2 ##((-b - d) / (2 * a))))
+  `((x1 ,x1) (x2 ,x2)))"
+  
+  "(let ((result ##a[0] + 2 * a[1] + 3 ^ a[2] - a[3] * b[i][j][i + j]))
+result)"
+
+"(let ((result (* n ##3/4^3 + 2/7^5)))
+(* result (f result) ##g(g(g(result, result), result), result)))"
+
+"## a + b * c * d"
+"## a + b ^ c ^ d"
+"## a[0] + a[a[0]] * a[a[a[0]]] ^ a[a[a[a[0]]]] ^ a[a[a[a[a[0]]]]]"
+
+"(define pi ##4 * atan(1))"
+
+;"## 2 + #; 3 - 4 + 5 * 6 ^ 7 8"
+
+ ;"##8 ^ (7+8) (3)[4][5][6](5,3+7^2)(9)[ ( 17 * 3) ^ 5 ] +7"
+
+"`(the answer is ##2 * 3 + 4 * 5)"
+
+"(+ 1 ##2 + 3 a b c)"
+
 ))
 
 (runAllTests
@@ -170,8 +245,11 @@
       (cons "Unquoted" unquotedTests)
       (cons "Proper List" properListTests)
       (cons "Improper List" improperListTests)
-      ;(cons "InfixArrayGet" infixArrayGetTests)
-      (cons "InfixExp" infixExpTests)  
-      ;(cons "MayerTests" MayerTests)    
+      (cons "InfixArrayGet" infixArrayGetTests)
+      (cons "infixSexprEscape" infixSexprEscapeTests)
+       (cons "InfixExp" infixExpTests)  
+       (cons "InfixFuncall" infixFuncallTests)
+      (cons "Comments" commentsTests)
+      (cons "MayerTests" MayerTests)    
 ))
 
