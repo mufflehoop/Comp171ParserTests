@@ -13,7 +13,7 @@
 			(display ": ")			
 			(cond ((equal? my-res staff-res)
 				(display "\033[1;32mSuccess!\033[0m") (newline) #t)
-				(else (display ": \033[1;31mFailed!\033[0m ") 
+				(else (display "\033[1;31mFailed!\033[0m ") 
 					(display ", expected: ")					
 					(display staff-res)
 					(display ", actual:")
