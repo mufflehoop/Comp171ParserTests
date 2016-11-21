@@ -1,5 +1,5 @@
 ; Change to your own location
-(load "~/compilation/parser.so")
+(load "~/compilation/parser-new.so")
 (load "~/compilation/compiler.scm")
 
 (define <my-sexpr> <sexpr-2>) ; Change to your sexpr name
@@ -56,7 +56,7 @@
 	(list	"#\\a" "#\\B" "#\\9" "#\\space" "#\\lambda"
 		"#\\newline" "#\\nul" "#\\page"
 		"#\\return" "#\\tab" "#\\x41" "#\\x23" "#\\x20" "  #\\xab   "
-		"#\\x0" "#\\x110000"
+		"#\\x0" "#\\x110000" "#\\abc" "#\\x"
 	  ))
 	  
 (define stringTests
@@ -133,12 +133,15 @@
 	    "  #%  5   /   2 [-4 + a *  -7/16  * 9 * 154 ] "
 	    " ## 123a[ + bc321 ** 3  /  6]" 
 	    "## a[0] + a[a[a[a[a[0]]]]]"
+	    "##ABC[##a+2]"
+	    "##ABC[###\\a]"
 ))  
 
 (define infixFuncallTests
 	(list	  
 	    "##f()"
 	    "##A(      )"
+	    "##-FUNC()"
 	    "##func(a,b,c,d,e,fgh)"
 	    "## FunctionCall123 ( arg1  , arg2  , arg3 , arg5)"
 	    "## func ( 1+2, 3*4)"
@@ -185,19 +188,25 @@
 	    "## a ^ b ^ c ^ 3 ^ d + -50/45 ^ abc"
 	    "## 8 ^ (7+8)[5][6]"
 	    "## a + b * c * d"
-	    "## a + b ^ c ^ d"	    
+	    "## a + b ^ c ^ d"
+	    "#% a/b + c/d"
+	    "##-a*-b"
+	    "##-a-b-c"
+	    "##a+b+c"	    
 ))
 
 (define infixSexprEscapeTests 
   (list
     "## ## #t"
     "## #% \"abc\""
+    "####a+b +c"
+    "##-##a+b +c+d"
 ))
 
 (define commentsTests
   (list
     "## 2 - 3 - 4"
-    "## 2 + #; 3 - 4 + 5 * 6 ^ 7 8 #; 1+2^3"
+    "## 2- #; 3 - 4 + 5 * 6 ^ 7 +8 #; 1+2^3"
     
     ; Line Comments
     " 2^5 ; ## 3+4+5"
@@ -215,7 +224,7 @@
     "## #; 1+2 a-b[#;5+3 4+5 #; 1+5^7] #; #\\a"
     "#; \"345\" ## 2+ #; 3- 5*6 8 #; \"abc\""
     " \" Akuna Matata \" ; ABCE1234"
-    "#; #\\lambda ## #; 5^64*-12/45 1+2+FUNC(a#;1+2+3,b,1+5) #; \"abcde\""
+    "#; #\\lambda ## #; 5^64*-12/45 1+2+FUNC(a#;1+2+3,b,1+5) #; \"abcde\""   
    ))
 
 (define MayerExamples
@@ -259,6 +268,8 @@
   "`(the answer is ##2 * 3 + 4 * 5)"
 
   "(+ 1 ##2 + 3 a b c)"
+  
+  "##-a-b-c"
 
 ))
 
