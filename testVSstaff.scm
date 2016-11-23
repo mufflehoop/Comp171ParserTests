@@ -156,6 +156,7 @@
 	    "## FunctionCall123 ( arg1  , arg2  , arg3 , arg5)"
 	    "## func ( 1+2, 3*4)"
 	    "#% -F1(F2(a,b,  F3(c)))"
+	    "## FUNC321(a)(b)(c)"
 )) 
 	  
 (define infixExpTests
@@ -202,7 +203,12 @@
 	    "#% a/b + c/d"
 	    "##-a*-b"
 	    "##-a-b-c"
-	    "##a+b+c"	    
+	    "##a+b+c"
+	    "##---a"
+	    "##a-(12+34)"
+	    "#%f[5][7](4)"
+	    "#%f(3)(7)[4]"
+	    "##FUNCTIONnameWithArray[1 #; (a^2+b^2)/(c^2)](2)[3+4^(-50/64)*82+a](## \"This is infixSexprEscape\" #; \"This is comment\")"
 ))
 
 (define infixSexprEscapeTests 
@@ -305,8 +311,8 @@
       (cons "Improper List" improperListTests)
       (cons "InfixArrayGet" infixArrayGetTests)
       (cons "infixSexprEscape" infixSexprEscapeTests)
-       (cons "InfixExp" infixExpTests)  
-       (cons "InfixFuncall" infixFuncallTests)
+      (cons "InfixExp" infixExpTests)  
+      (cons "InfixFuncall" infixFuncallTests)
       (cons "Comments" commentsTests)
       (cons "MayerExamples" MayerExamples)    
 ))
