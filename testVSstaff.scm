@@ -101,22 +101,22 @@
   
 (define quotedTests
   (list 
-    "'123" "'#t" "'#\\lambda" "'\"123a\"" "  'a123   " 
+    "'123" "'#t" "'#\\lambda" "'\"123a\"" "  'a123   " "  '   1SymbolWithSpacesAfterQuote456  "
   ))
   
 (define quasiquotedTests
   (list 
-    "`123" "`#t" "`#\\lambda" "`\"123a\"" "   `a123  " 
+    "`123" "`#t" "`#\\lambda" "`\"123a\"" "   `a123  "  "  `   2SymbolWithSpacesAfterQuasiQuote321  "
   ))
   
 (define unquotedTests
   (list 
-    ",123" ",#t" ",#\\lambda" ",\"123a\"" "   ,a123  " 
+    ",123" ",#t" ",#\\lambda" ",\"123a\"" "   ,a123  " "  ,  ASymbolWithSpacesAfterUnquoted123  "
   ))
   
 (define unquoteAndSplicedTests
   (list 
-    ",@123" ",@#t" ",@#\\lambda" ",@\"123a\"" "  ,@a123   " 
+    ",@123" ",@#t" ",@#\\lambda" ",@\"123a\"" "  ,@a123   " "  ,@  ASymbolWithSpacesAfterUnquoted123  "
   ))
   
 (define infixArrayGetTests
